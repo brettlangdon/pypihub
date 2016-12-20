@@ -46,7 +46,7 @@ func (s *Server) startTimer() {
 	if s.timer != nil {
 		s.timer.Stop()
 	}
-	s.timer = time.AfterFunc(time.Duration(5*time.Minute), func() {
+	s.timer = time.AfterFunc(time.Duration(10*time.Minute), func() {
 		go s.refetchAssets()
 	})
 }
@@ -59,6 +59,22 @@ func (s *Server) listAssets(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<h1>Links for %s</h1>", repo)
 	for _, a := range s.assets {
 		if a.Repo == repo {
+			fmt.Fprintf(w, "<a href=\"%s\">%s</a> ", a.URL(), a.Name)
+		}
+	}
+	fmt.Fprintf(w, "</body></html>")
+}
+
+func (s *Server) listRepoAssets(w http.ResponseWriter, r *http.Request) {
+	var parts = strings.SplitN(strings.Trim(r.URL.Path, "/"), "/", 2)
+	var owner = parts[0]
+	var repo = parts[1]
+
+	w.Header().Add("Content-Type", "text/html")
+	fmt.Fprintf(w, "<html><title>Links for %s</title><meta name=\"api-version\" content=\"2\" /><body>", repo)
+	fmt.Fprintf(w, "<h1>Links for %s</h1>", repo)
+	for _, a := range s.assets {
+		if a.Owner == owner && a.Repo == repo {
 			fmt.Fprintf(w, "<a href=\"%s\">%s</a> ", a.URL(), a.Name)
 		}
 	}
@@ -140,13 +156,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case 0:
 		s.listAllAssets(w, r)
 	case 1:
-		if parts[0] == "simple" {
-			s.listRepos(w, r)
-		} else if parts[0] == "favicon.ico" {
+		if parts[0] == "favicon.ico" {
 			s.serveFavicon(w, r)
 		} else {
 			s.listAssets(w, r)
 		}
+	case 2:
+		s.listRepoAssets(w, r)
 	default:
 		s.fetchAsset(w, r)
 	}
