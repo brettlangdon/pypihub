@@ -26,7 +26,7 @@ func ParseConfig() Config {
 		config.RepoNames = append(config.RepoNames, strings.Split(val, " ")...)
 	}
 	for i := range config.RepoNames {
-		config.RepoNames[i] = strings.Trim(config.RepoNames[i], " ")
+		config.RepoNames[i] = strings.TrimSpace(config.RepoNames[i])
 	}
 
 	config.RepoNames = uniqueSlice(config.RepoNames)

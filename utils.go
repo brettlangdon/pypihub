@@ -12,3 +12,13 @@ func uniqueSlice(s []string) []string {
 	}
 	return o
 }
+
+func removeEmpty(s []string) []string {
+	var n = make([]string, 0)
+	for _, c := range s {
+		if c != "" {
+			n = append(n, c)
+		}
+	}
+	return n
+}
