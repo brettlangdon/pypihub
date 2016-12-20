@@ -1,7 +1,13 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/brettlangdon/pypihub"
+)
 
 func main() {
-	fmt.Println("PyPIHub")
+	var config pypihub.Config
+	config = pypihub.ParseConfig()
+	fmt.Printf("%#v\r\n", config)
 }
