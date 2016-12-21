@@ -3,7 +3,6 @@ PyPIHub
 
 PyPI server for serving Python packages out of GitHub.
 
-
 ## Installing
 
 ```bash
@@ -39,6 +38,24 @@ export PYPIHUB_USERNAME="<username>"
 export PYPIHUB_ACCESS_TOKEN="<github-access-token>""
 export PYPIHUB_REPOS="brettlangdon/flask-env brettlangdon/flask-defer [... <owner>/<repo>]"
 pypihub
+```
+
+## Docker
+
+```bash
+docker run --rm -it -p "8287:8287" -e PYPIHUB_USERNAME="<username>" -e PYPIHUB_ACCESS_TOKEN="<github-acess-token>" -e PYPIHUB_REPOS="<owner>/<repo> ..." brettlangdon/pypihub:latest
+```
+
+### Using an env file
+
+```
+PYPIHUB_USERNAME=<username>
+PYPIHUB_ACCESS_TOKEN=<github-access-token>
+PYPIHUB_REPOS=<owner>/<repo> ...
+```
+
+```bash
+docker run --rm -it -p "8287:8287" --env-file ./.env brettlangdon/pypihub:latest
 ```
 
 ## Endpoints
