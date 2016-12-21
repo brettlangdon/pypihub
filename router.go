@@ -30,11 +30,13 @@ func NewRouter(config Config) *Router {
 func (r *Router) refetchAssets() {
 	go r.startAssetsTimer()
 
+	log.Printf("refetching assets for %d repos", len(r.config.RepoNames))
 	var err error
 	r.assets, err = r.client.GetAllAssets()
 	if err != nil {
 		log.Println(err)
 	}
+	log.Printf("found %d assets for %d repos", len(r.assets), len(r.config.RepoNames))
 }
 
 func (r *Router) startAssetsTimer() {
