@@ -9,13 +9,10 @@ clean:
 	rm -f ./pypihub
 	rm -rf ./build
 
-run:
-	go run ./cmd/pypihub/main.go
-
 docker_build: build/pypihub
 	docker build -t pypihub .
 
 docker_up: docker_build
 		docker-compose up --build
 
-.PHONY: clean docker_build run docker)up
+.PHONY: clean docker_build docker_up
