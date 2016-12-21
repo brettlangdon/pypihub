@@ -12,5 +12,7 @@ func main() {
 
 	var router *pypihub.Router
 	router = pypihub.NewRouter(config)
+
+	log.Printf("server listening on %s", config.Bind)
 	log.Fatal(router.Start())
 }
