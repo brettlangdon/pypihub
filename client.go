@@ -3,7 +3,6 @@ package pypihub
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -61,7 +60,6 @@ func (c *Client) getRepoTagAssets(owner string, repo string) ([]Asset, error) {
 			Ref:    *tag.Name,
 			Format: "tarball",
 		})
-		log.Printf("found asset %s/%s/%s/%s", owner, repo, *tag.Name, name)
 	}
 
 	return allAssets, nil
@@ -101,7 +99,6 @@ func (c *Client) GetRepoAssets(r string) ([]Asset, error) {
 				Owner: owner,
 				Repo:  repo,
 			})
-			log.Printf("found asset %s/%s/%s/%s", owner, repo, *rel.Name, *a.Name)
 		}
 
 		if hasTar == false {
@@ -115,7 +112,6 @@ func (c *Client) GetRepoAssets(r string) ([]Asset, error) {
 				Ref:    *rel.TagName,
 				Format: "tarball",
 			})
-			log.Printf("found asset %s/%s/%s/%s", owner, repo, *rel.Name, name)
 		}
 
 	}
