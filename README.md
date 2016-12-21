@@ -63,6 +63,16 @@ pypihub
 
 ## Usage with pip
 
+### Simple index
 ```bash
+pip install --index-url http://localhost:8287/simple <project>
 pip install --extra-index-url http://localhost:8287/simple <project>
+```
+
+### Find links
+
+```bash
+pip install --find-links http://localhost:8287/ <project>
+pip install --find-links http://localhost:8287/<owner> project
+pip install --find-links http://localhost:8287/<owner>/<project> project
 ```
