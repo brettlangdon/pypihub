@@ -156,13 +156,27 @@ func (r *Router) logRequests(h http.Handler) http.Handler {
 
 func (r *Router) Handler() http.Handler {
 	var h *mux.Router
-	h = mux.NewRouter()
-	h.HandleFunc("/", r.handleIndex).Methods("GET")
+	h = mux.NewRouter().StrictSlash(false)
+
+	// Static favicon
 	h.HandleFunc("/favicon.ico", r.handleFavicon).Methods("GET")
+
+	// All links, useful for non-owner/repo specific --find-links
+	h.HandleFunc("/", r.handleIndex).Methods("GET")
+
+	// Simple index
 	h.HandleFunc("/simple", r.handleSimple).Methods("GET")
+	h.HandleFunc("/simple/", r.handleSimple).Methods("GET")
+	h.HandleFunc("/simple/{repo}", r.handleSimpleProject).Methods("GET")
+	h.HandleFunc("/simple/{repo}/", r.handleSimpleProject).Methods("GET")
+
+	// Owner/repo specific find-links
 	h.HandleFunc("/{owner}", r.handleOwnerIndex).Methods("GET")
+	h.HandleFunc("/{owner}/", r.handleOwnerIndex).Methods("GET")
 	h.HandleFunc("/{owner}/{repo}", r.handleRepoIndex).Methods("GET")
-	h.HandleFunc("/{owner}/{repo}", r.handleRepoIndex).Methods("GET")
+	h.HandleFunc("/{owner}/{repo}/", r.handleRepoIndex).Methods("GET")
+
+	// Download asset
 	h.HandleFunc("/{owner}/{repo}/{asset}", r.handleFetchAsset).Methods("GET")
 	return r.logRequests(h)
 }
