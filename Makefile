@@ -3,7 +3,7 @@ pypihub: ./*.go ./cmd/pypihub/*.go
 
 build/pypihub: ./*.go ./cmd/pypihub/*.go
 	mkdir -p build/
-	CGO_ENABLED=0 GOOS=linux go build -a -tags netgo -ldflags '-w' -o build/pypihub ./cmd/pypihub/
+	CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-w' -o build/pypihub ./cmd/pypihub/
 
 clean:
 	rm -f ./pypihub
