@@ -10,7 +10,7 @@ clean:
 	rm -rf ./build
 
 docker_build: build/pypihub
-	docker build -t pypihub .
+	docker build -t brettlangdon/pypihub .
 
 docker_up: docker_build
 		docker-compose up --build
