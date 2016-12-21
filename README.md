@@ -1,4 +1,4 @@
 PyPIHub
 =======
 
-PyPI server for installing Python packages from GitHub repo releases.
+PyPI server for serving Python packages out of GitHub.
