@@ -1,6 +1,7 @@
 package pypihub
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -12,6 +13,10 @@ type Config struct {
 	AccessToken string   `arg:"-a,--access-token,env:PYPIHUB_ACCESS_TOKEN,required,help:GitHub personal access token to use for authenticating (env: PYPIHUB_ACCESS_TOKEN)"`
 	RepoNames   []string `arg:"positional,help:list of '<username>/<repo>' repos to proxy for (env: PYPIHUB_REPOS)"`
 	Bind        string   `arg:"-b,--bind,env:PYPIHUB_BIND,help:[<address>]:<port> to bind the server to (default: ':8287') (env: PYPIHUB_BIND)"`
+}
+
+func (c Config) Version() string {
+	return fmt.Sprintf("pypihub %s", VERSION)
 }
 
 func ParseConfig() Config {
