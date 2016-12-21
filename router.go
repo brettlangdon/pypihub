@@ -44,14 +44,29 @@ func (r *Router) startAssetsTimer() {
 }
 
 func (r *Router) handleSimple(w http.ResponseWriter, req *http.Request) {
-	fmt.Fprintf(w, "<html><title>Simple index</title><body>")
+	fmt.Fprintf(w, "<html><title>Simple index</title><meta name=\"api-version\" value=\"2\" /><body>")
 	var projects = make(map[string]bool)
 	for _, a := range r.assets {
 		projects[strings.ToLower(a.Repo)] = true
 	}
 
 	for project := range projects {
-		fmt.Fprintf(w, "<a href=\"/%s\">%s</a> ", project, project)
+		fmt.Fprintf(w, "<a href=\"/simple/%s\">%s</a> ", project, project)
+	}
+	fmt.Fprintf(w, "</body></html>")
+}
+
+func (r *Router) handleSimpleProject(w http.ResponseWriter, req *http.Request) {
+	var vars map[string]string
+	vars = mux.Vars(req)
+	var repo = strings.ToLower(vars["repo"])
+
+	fmt.Fprintf(w, "<html><title>Links for %s</title><meta name=\"api-version\" value=\"2\" /><body>", repo)
+	fmt.Fprintf(w, "<h1>Links for all %s</h1>", repo)
+	for _, a := range r.assets {
+		if strings.ToLower(a.Repo) == repo {
+			fmt.Fprintf(w, "<a href=\"%s\">%s</a> ", a.URL(), a.Name)
+		}
 	}
 	fmt.Fprintf(w, "</body></html>")
 }
@@ -91,6 +106,7 @@ func (r *Router) handleRepoIndex(w http.ResponseWriter, req *http.Request) {
 	var repo = strings.ToLower(vars["repo"])
 
 	fmt.Fprintf(w, "<html><title>Packages for %s/%s</title><body>", owner, repo)
+	fmt.Fprintf(w, "<h1>Links for all %s/%s</h1>", owner, repo)
 	for _, a := range r.assets {
 		if strings.ToLower(a.Owner) == owner && strings.ToLower(a.Repo) == repo {
 			fmt.Fprintf(w, "<a href=\"%s\">%s</a> ", a.URL(), a.Name)
