@@ -76,3 +76,14 @@ pip install --find-links http://localhost:8287/ <project>
 pip install --find-links http://localhost:8287/<owner> project
 pip install --find-links http://localhost:8287/<owner>/<project> project
 ```
+
+### requirements.txt
+
+```
+--find-links http://localhost:8287/
+<project>
+```
+
+```bash
+pip install -r requirements.txt
+```
