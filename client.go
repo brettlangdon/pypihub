@@ -1,8 +1,11 @@
 package pypihub
 
 import (
+	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/google/go-github/github"
@@ -38,6 +41,32 @@ func (c *Client) splitRepoName(r string) (string, string) {
 	}
 }
 
+func (c *Client) getRepoTagAssets(owner string, repo string) ([]Asset, error) {
+	var tags []*github.RepositoryTag
+	var err error
+	tags, _, err = c.client.Repositories.ListTags(owner, repo, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var allAssets = make([]Asset, 0)
+	for _, tag := range tags {
+		// Remove any `v` prefix, e.g. `v1.0.0` -> `1.0.0`
+		var name = strings.Trim(*tag.Name, "v")
+		name = fmt.Sprintf("%s-%s.tar.gz", repo, name)
+		allAssets = append(allAssets, Asset{
+			Name:   name,
+			Owner:  owner,
+			Repo:   repo,
+			Ref:    *tag.Name,
+			Format: "tarball",
+		})
+		log.Printf("found asset %s/%s/%s/%s", owner, repo, *tag.Name, name)
+	}
+
+	return allAssets, nil
+}
+
 func (c *Client) GetRepoAssets(r string) ([]Asset, error) {
 	var owner, repo string
 	owner, repo = c.splitRepoName(r)
@@ -49,6 +78,10 @@ func (c *Client) GetRepoAssets(r string) ([]Asset, error) {
 		return nil, err
 	}
 
+	if len(releases) == 0 {
+		return c.getRepoTagAssets(owner, repo)
+	}
+
 	var allAssets = make([]Asset, 0)
 	for _, rel := range releases {
 		var assets []*github.ReleaseAsset
@@ -56,14 +89,35 @@ func (c *Client) GetRepoAssets(r string) ([]Asset, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		var hasTar = false
 		for _, a := range assets {
+			if strings.HasSuffix(*a.Name, ".tar.gz") {
+				hasTar = true
+			}
 			allAssets = append(allAssets, Asset{
 				ID:    *a.ID,
 				Name:  *a.Name,
 				Owner: owner,
 				Repo:  repo,
 			})
+			log.Printf("found asset %s/%s/%s/%s", owner, repo, *rel.Name, *a.Name)
 		}
+
+		if hasTar == false {
+			// Remove any `v` prefix, e.g. `v1.0.0` -> `1.0.0`
+			var name = strings.Trim(*rel.Name, "v")
+			name = fmt.Sprintf("%s-%s.tar.gz", repo, name)
+			allAssets = append(allAssets, Asset{
+				Name:   name,
+				Owner:  owner,
+				Repo:   repo,
+				Ref:    *rel.TagName,
+				Format: "tarball",
+			})
+			log.Printf("found asset %s/%s/%s/%s", owner, repo, *rel.Name, name)
+		}
+
 	}
 	return allAssets, nil
 }
@@ -97,4 +151,25 @@ func (c *Client) DownloadAsset(a Asset) (io.ReadCloser, error) {
 		rc = resp.Body
 	}
 	return rc, err
+}
+
+func (c *Client) DownloadArchive(a Asset) (io.ReadCloser, error) {
+	var f = github.Tarball
+	if a.Format == "zipball" {
+		f = github.Zipball
+	}
+
+	var u *url.URL
+	var err error
+	u, _, err = c.client.Repositories.GetArchiveLink(a.Owner, a.Repo, f, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var resp *http.Response
+	resp, err = http.Get(u.String())
+	if err != nil {
+		return nil, err
+	}
+	return resp.Body, nil
 }

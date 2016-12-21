@@ -1,12 +1,16 @@
 package main
 
-import "github.com/brettlangdon/pypihub"
+import (
+	"log"
+
+	"github.com/brettlangdon/pypihub"
+)
 
 func main() {
 	var config pypihub.Config
 	config = pypihub.ParseConfig()
 
-	var server *pypihub.Server
-	server = pypihub.NewServer(config)
-	panic(server.ListenAndServe())
+	var router *pypihub.Router
+	router = pypihub.NewRouter(config)
+	log.Fatal(router.Start())
 }
