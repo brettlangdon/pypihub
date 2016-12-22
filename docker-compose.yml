@@ -1,0 +1,7 @@
+version: '2'
+services:
+  pypihub:
+    build: .
+    env_file: '.env'
+    ports:
+      - "8287:8287"
